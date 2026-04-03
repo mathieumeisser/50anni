@@ -948,6 +948,9 @@ async function submitMessage(e) {
   document.getElementById('mb-ok').style.display = 'block';
   document.getElementById('mb-ok').textContent = T[lang].gb_success;
   setTimeout(() => document.getElementById('mb-ok').style.display = 'none', 4000);
+  // Reload from server after a short delay to confirm persistence
+  if (MESSAGE_BOARD_URL !== 'YOUR_MESSAGE_BOARD_APPS_SCRIPT_URL')
+    setTimeout(loadMessages, 2000);
 }
 
 function addMessageCard({ name, from, msg, img, date }) {
@@ -971,11 +974,12 @@ function addMessageCard({ name, from, msg, img, date }) {
 async function loadMessages() {
   if (MESSAGE_BOARD_URL === 'YOUR_MESSAGE_BOARD_APPS_SCRIPT_URL') return;
   try {
-    const res = await fetch(MESSAGE_BOARD_URL, { redirect:'follow' });
+    const res  = await fetch(MESSAGE_BOARD_URL, { redirect:'follow' });
     const data = await res.json();
     if (!Array.isArray(data) || data.length === 0) return;
-    // Clear sample card
-    document.getElementById('mb-feed').innerHTML = '';
+    // Replace feed entirely with server data (avoids duplicates on reload)
+    const feed = document.getElementById('mb-feed');
+    feed.innerHTML = '';
     data.forEach(m => addMessageCard({ name:m.name, from:m.from, msg:m.msg, img:m.img||null, date:m.date }));
   } catch(_) {}
 }
