@@ -953,12 +953,25 @@ async function submitMessage(e) {
     setTimeout(loadMessages, 2000);
 }
 
+/** Converts deprecated drive.google.com/uc URLs to the embeddable thumbnail format. */
+function fixDriveImgUrl(url) {
+  if (!url) return url;
+  if (url.includes('drive.google.com/uc')) {
+    const m = url.match(/[?&]id=([^&]+)/);
+    if (m) return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w900';
+  }
+  return url;
+}
+
 function addMessageCard({ name, from, msg, img, date }) {
+  const imgSrc = fixDriveImgUrl(img);
   const card = document.createElement('div');
   card.className = 'mb-card';
   card.innerHTML = `
-    ${img
-      ? `<img class="mb-photo" src="${img}" alt="${esc(name)}'s photo" />`
+    ${imgSrc
+      ? `<img class="mb-photo" src="${imgSrc}" alt="${esc(name)}'s photo"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+         <div class="mb-photo-placeholder" style="display:none"><span>Photo unavailable</span></div>`
       : `<div class="mb-photo-placeholder"><span>No photo</span></div>`}
     <div class="mb-body">
       <div class="mb-author">${esc(name)}</div>
