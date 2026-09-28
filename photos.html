@@ -47,6 +47,7 @@
     .gal-item:hover img { transform: scale(1.03); }
     .gal-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px; font-size: 0.68rem; color: #fff; text-align: left; background: linear-gradient(transparent, rgba(0,0,0,0.55)); }
     .gal-empty { grid-column: 1 / -1; padding: 48px 24px; border: 1px dashed var(--accent-light); text-align: center; color: var(--mid); font-size: 0.9rem; }
+    .gal-chapter { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin: 56px 0 -20px; display: block; }
     .gal-sub { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; margin-top: 64px; }
     .btn { display: inline-block; margin-top: 28px; padding: 13px 36px; background: var(--dark); color: var(--cream); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: background 0.2s; }
     .btn:hover { background: var(--accent); }
@@ -107,7 +108,7 @@
   <span class="section-label" data-t="gallery_label"></span>
   <h2 class="section-title" data-t="gallery_title"></h2>
   <p class="body-text" data-t="gallery_body"></p>
-  <div class="gallery-grid" id="gallery-grid"></div>
+  <div id="gallery-sections"></div>
 
   <h3 class="gal-sub" data-t="guest_title"></h3>
   <div class="gallery-grid" id="guest-grid"></div>
@@ -140,6 +141,7 @@ const T = {
     page_subtitle:'Memories from the journey',
     gallery_label:'Memories', gallery_title:'Photos.',
     gallery_body:'Photos from four days on the Via Alta Valle Maggia, the dinner in Cimalmotto and the lunch in Bosco Gurin. Click a photo to enlarge it.',
+    chapters:['The trek','The evening in Cimalmotto','All together to Bosco Gurin','Lunch at Hotel Walser'],
     guest_title:'From our guests', upload_btn:'Share your photos',
     empty:'The first photos are on their way.', guest_empty:'No guest photos yet — be the first to share yours on the message board!',
   },
@@ -151,6 +153,7 @@ const T = {
     page_subtitle:'Souvenirs du voyage',
     gallery_label:'Souvenirs', gallery_title:'Photos.',
     gallery_body:"Les photos de quatre jours sur la Via Alta Valle Maggia, du dîner à Cimalmotto et du déjeuner à Bosco Gurin. Cliquez sur une photo pour l'agrandir.",
+    chapters:['Le trek','La soirée à Cimalmotto','Tous ensemble à Bosco Gurin','Le déjeuner à l’Hôtel Walser'],
     guest_title:'Les photos des invités', upload_btn:'Partager vos photos',
     empty:'Les premières photos arrivent bientôt.', guest_empty:"Pas encore de photos d'invités — soyez le premier à partager les vôtres sur le livre d'or !",
   },
@@ -162,6 +165,7 @@ const T = {
     page_subtitle:'Ricordi del viaggio',
     gallery_label:'Ricordi', gallery_title:'Foto.',
     gallery_body:'Le foto di quattro giorni sulla Via Alta Valle Maggia, della cena a Cimalmotto e del pranzo a Bosco Gurin. Clicca su una foto per ingrandirla.',
+    chapters:['Il trekking','La serata a Cimalmotto','Tutti insieme a Bosco Gurin','Il pranzo all’Hotel Walser'],
     guest_title:'Le foto degli invitati', upload_btn:'Condividi le tue foto',
     empty:'Le prime foto arriveranno presto.', guest_empty:'Ancora nessuna foto degli invitati — sii il primo a condividere le tue sulla bacheca dei messaggi!',
   }
@@ -186,8 +190,17 @@ function setLang(l) {
 // ── PHOTOS ────────────────────────────────────────────────────────────
 // To add photos: put the files in the /photos folder of the repo and list them here.
 // { src: 'photos/filename.jpg', caption: 'optional caption' }
-const PHOTOS = [
-];
+// Chapters: photo numbers (photos/NNN.jpg, thumbnails in photos/thumbs/)
+const CHAPTERS = [ [1, 27], [28, 47], [48, 59], [60, 94] ];
+const SKIP = [12]; // no. 12 was a video
+const PHOTOS = [];
+CHAPTERS.forEach(([a, b], c) => {
+  for (let n = a; n <= b; n++) {
+    if (SKIP.includes(n)) continue;
+    const f = String(n).padStart(3, '0') + '.jpg';
+    PHOTOS.push({ src: 'photos/' + f, thumb: 'photos/thumbs/' + f, chapter: c });
+  }
+});
 
 // Guest photos come from the message board (Google Apps Script)
 const MESSAGE_BOARD_URL = 'https://script.google.com/macros/s/AKfycbyTPn8MPv_CRJ9rVQs5BQ9HCJHFQMr_73q1vVFibnxP1DS8Za2Okcm_r88Ix0o0ug1shA/exec';
@@ -199,16 +212,22 @@ function driveImg(url) {
   const m = url && url.includes('drive.google.com') && url.match(/[?&]id=([^&]+)/);
   return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600' : url;
 }
-function tiles(list, group) {
+function tiles(list, group, offset = 0) {
   return list.map((p, i) => `
-    <button class="gal-item" onclick="openLb('${group}', ${i})">
-      <img src="${esc(p.src)}" alt="${esc(p.caption)}" loading="lazy" onerror="this.parentElement.style.display='none'" />
+    <button class="gal-item" onclick="openLb('${group}', ${i + offset})">
+      <img src="${esc(p.thumb || p.src)}" alt="${esc(p.caption)}" loading="lazy" onerror="this.parentElement.style.display='none'" />
       ${p.caption ? `<span class="gal-cap">${esc(p.caption)}</span>` : ''}
     </button>`).join('');
 }
 function renderGalleries() {
   const t = T[lang];
-  document.getElementById('gallery-grid').innerHTML = PHOTOS.length ? tiles(PHOTOS, 'main') : `<div class="gal-empty">${t.empty}</div>`;
+  document.getElementById('gallery-sections').innerHTML = PHOTOS.length
+    ? t.chapters.map((name, c) => {
+        const first = PHOTOS.findIndex(p => p.chapter === c);
+        const list = PHOTOS.filter(p => p.chapter === c);
+        return `<span class="gal-chapter">${name}</span><div class="gallery-grid">${tiles(list, 'main', first)}</div>`;
+      }).join('')
+    : `<div class="gallery-grid"><div class="gal-empty">${t.empty}</div></div>`;
   document.getElementById('guest-grid').innerHTML = guestPhotos.length ? tiles(guestPhotos, 'guest') : `<div class="gal-empty">${t.guest_empty}</div>`;
 }
 async function loadGuestPhotos() {
