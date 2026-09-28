@@ -94,8 +94,6 @@
     .opt-includes-label { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--light); display: block; margin-bottom: 8px; }
     .opt-include-item { font-size: 0.8rem; color: var(--mid); display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
     .opt-include-item::before { content: '—'; color: var(--accent-light); flex-shrink: 0; }
-    .opt-cta { display: inline-block; margin-top: 6px; padding: 10px 18px; border: 1px solid var(--dark); background: none; font-family: 'Inter', sans-serif; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dark); cursor: pointer; transition: all 0.2s; text-decoration: none; text-align: center; }
-    .opt-cta:hover { background: var(--dark); color: var(--cream); }
 
     /* PROGRAMME */
     .programme { margin-top: 48px; }
@@ -133,24 +131,9 @@
     .accom-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; font-size: 0.74rem; color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-light); padding-bottom: 1px; transition: all 0.2s; }
     .accom-link:hover { color: var(--dark); border-color: var(--dark); }
 
-    /* RSVP */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 40px; }
-    .form-full { grid-column: 1 / -1; }
-    .form-group { display: flex; flex-direction: column; gap: 7px; }
-    .form-label { font-size: 0.67rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mid); }
-    .form-input, .form-select, .form-textarea { font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 300; color: var(--dark); background: white; border: 1px solid var(--border); padding: 11px 14px; outline: none; transition: border-color 0.2s; width: 100%; border-radius: 0; }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
-    .form-textarea { resize: vertical; min-height: 90px; }
-    .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239e9e94'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
-    .option-radios { display: flex; flex-direction: column; gap: 10px; }
-    .radio-opt { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; padding: 14px 16px; border: 1px solid var(--border); transition: border-color 0.2s; }
-    .radio-opt:hover { border-color: var(--accent-light); }
-    .radio-opt input[type="radio"] { accent-color: var(--accent); margin-top: 3px; flex-shrink: 0; }
-    .radio-opt-title { font-size: 0.88rem; font-weight: 400; color: var(--dark); }
-    .radio-opt-sub { font-size: 0.76rem; color: var(--light); }
+    /* BUTTONS */
     .btn { display: inline-block; padding: 13px 36px; background: var(--dark); color: var(--cream); font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; border: none; cursor: pointer; transition: background 0.2s; }
     .btn:hover { background: var(--accent); }
-    .form-success { display: none; padding: 20px 24px; background: #f2ead8; border-left: 3px solid var(--accent); margin-top: 24px; font-size: 0.88rem; color: var(--mid); }
 
     /* RECAP */
     .recap { margin-top: 48px; }
@@ -175,7 +158,6 @@
       nav { padding: 14px 20px; }
       .nav-links { display: none; }
       .options-grid { grid-template-columns: 1fr; }
-      .form-grid, .gb-grid { grid-template-columns: 1fr; }
       #map { height: 340px; }
       .countdown { gap: 24px; }
       .prog-inner { padding-left: 0; }
@@ -316,7 +298,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-// RSVP closed after the event (Apps Script URL kept for reference): 'https://script.google.com/macros/s/AKfycbx7VcWRrUxxVMR6wyJd-fo7qOdse7jL6lxsxYSG1XV9wJZpdccNtWt5d17MjUsTWR27rA/exec';
 
 // ── TRANSLATIONS ──────────────────────────────────────────────────────
 const T = {
