@@ -152,6 +152,19 @@
     .btn:hover { background: var(--accent); }
     .form-success { display: none; padding: 20px 24px; background: #f2ead8; border-left: 3px solid var(--accent); margin-top: 24px; font-size: 0.88rem; color: var(--mid); }
 
+    /* RECAP */
+    .recap { margin-top: 48px; }
+    .recap-day { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 26px 0; border-top: 1px solid var(--border); }
+    .recap-day:last-child { border-bottom: 1px solid var(--border); }
+    .recap-date { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); padding-top: 4px; }
+    .recap-title { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 400; line-height: 1.25; margin-bottom: 8px; }
+    .recap-text { font-size: 0.92rem; color: var(--mid); line-height: 1.85; }
+    .thanks-sign { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.4rem; color: var(--accent); margin-top: 24px; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+    .btn-ghost { background: none; color: var(--dark); border: 1px solid var(--dark); }
+    .btn-ghost:hover { background: var(--dark); color: var(--cream); }
+    a.btn { text-decoration: none; }
+
     /* FOOTER */
     footer { text-align: center; padding: 56px 24px; border-top: 1px solid var(--border); }
     .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 10px; }
@@ -166,42 +179,22 @@
       #map { height: 340px; }
       .countdown { gap: 24px; }
       .prog-inner { padding-left: 0; }
+      .recap-day { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
 <body>
 
-<!--
-=================================================================
-  GOOGLE SHEETS RSVP SETUP (one-time, ~5 min):
-  1. Go to https://script.google.com → New project
-  2. Paste this code:
-
-  function doPost(e) {
-    const ss = SpreadsheetApp.openById('YOUR_SPREADSHEET_ID');
-    const sheet = ss.getSheetByName('RSVPs') || ss.insertSheet('RSVPs');
-    if (sheet.getLastRow() === 0)
-      sheet.appendRow(['Timestamp','Name','Email','Option','Guests','Dietary','Message']);
-    const d = e.parameter;
-    sheet.appendRow([new Date(),d.name,d.email,d.option,d.guests,d.dietary||'',d.message||'']);
-    return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-
-  3. Deploy → New deployment → Web App → "Anyone" can access
-  4. Copy the URL and replace YOUR_APPS_SCRIPT_URL_HERE below
-=================================================================
--->
 
 <!-- NAV -->
 <nav id="main-nav">
   <a href="#hero" class="nav-logo">Mathieu · 50</a>
   <ul class="nav-links">
+    <li><a href="#recap"         data-t="nav_recap"></a></li>
     <li><a href="#options"       data-t="nav_options"></a></li>
     <li><a href="#programme"     data-t="nav_programme"></a></li>
     <li><a href="#map-section"   data-t="nav_map"></a></li>
     <li><a href="#accommodation" data-t="nav_accom"></a></li>
-    <li><a href="#rsvp"          data-t="nav_rsvp"></a></li>
     <li><a href="photos.html"       data-t="nav_photos"></a></li>
     <li><a href="messageboard.html" data-t="nav_messages"></a></li>
   </ul>
@@ -229,10 +222,10 @@
   <p class="hero-tagline" data-t="hero_tagline"></p>
   <div class="divider"></div>
   <div class="countdown">
-    <div class="countdown-unit"><span class="cd-num" id="cd-d">—</span><span class="cd-lbl" data-t="cd_days"></span></div>
-    <div class="countdown-unit"><span class="cd-num" id="cd-h">—</span><span class="cd-lbl" data-t="cd_hours"></span></div>
-    <div class="countdown-unit"><span class="cd-num" id="cd-m">—</span><span class="cd-lbl" data-t="cd_mins"></span></div>
-    <div class="countdown-unit"><span class="cd-num" id="cd-s">—</span><span class="cd-lbl" data-t="cd_secs"></span></div>
+    <div class="countdown-unit"><span class="cd-num">4</span><span class="cd-lbl" data-t="st_days"></span></div>
+    <div class="countdown-unit"><span class="cd-num">33</span><span class="cd-lbl" data-t="st_dinner"></span></div>
+    <div class="countdown-unit"><span class="cd-num">66</span><span class="cd-lbl" data-t="st_lunch"></span></div>
+    <div class="countdown-unit"><span class="cd-num">1</span><span class="cd-lbl" data-t="st_swim"></span></div>
   </div>
   <div class="scroll-hint"></div>
 </section>
@@ -240,10 +233,34 @@
 <hr class="sep" />
 
 <!-- ABOUT -->
-<div class="section-wrap" id="about">
-  <span class="section-label" data-t="about_label"></span>
-  <h2 class="section-title" data-t="about_title"></h2>
-  <p class="body-text" data-t="about_body"></p>
+<div class="section-wrap" id="thanks">
+  <span class="section-label" data-t="thanks_label"></span>
+  <h2 class="section-title" data-t="thanks_title"></h2>
+  <p class="body-text" data-t="thanks_body"></p>
+  <p class="thanks-sign">— Mathieu</p>
+</div>
+
+<hr class="sep" />
+
+<!-- RECAP -->
+<div class="section-wrap" id="recap">
+  <span class="section-label" data-t="recap_label"></span>
+  <h2 class="section-title" data-t="recap_title"></h2>
+  <p class="body-text" data-t="recap_intro"></p>
+  <div class="recap" id="recap-list"></div>
+</div>
+
+<hr class="sep" />
+
+<!-- PHOTOS -->
+<div class="section-wrap" id="photos-teaser">
+  <span class="section-label" data-t="ph_label"></span>
+  <h2 class="section-title" data-t="ph_title"></h2>
+  <p class="body-text" data-t="ph_body"></p>
+  <div class="btn-row">
+    <a class="btn" id="ph-gallery-btn" href="photos.html" data-t="ph_btn_gallery"></a>
+    <a class="btn btn-ghost" id="ph-upload-btn" href="messageboard.html" data-t="ph_btn_upload"></a>
+  </div>
 </div>
 
 <hr class="sep" />
@@ -291,49 +308,6 @@
   <div class="accom-grid" id="accom-grid"></div>
 </div>
 
-<hr class="sep" />
-
-<!-- RSVP -->
-<div class="section-wrap" id="rsvp">
-  <span class="section-label" data-t="rsvp_label"></span>
-  <h2 class="section-title" data-t="rsvp_title"></h2>
-  <p class="body-text" data-t="rsvp_intro"></p>
-  <form id="rsvp-form" onsubmit="submitRsvp(event)">
-    <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label" data-t="rsvp_name"></label>
-        <input class="form-input" type="text" name="name" required />
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="rsvp_email"></label>
-        <input class="form-input" type="email" name="email" required />
-      </div>
-      <div class="form-group form-full">
-        <label class="form-label" data-t="rsvp_option"></label>
-        <div class="option-radios" id="rsvp-radios"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="rsvp_guests"></label>
-        <select class="form-select" name="guests">
-          <option>1</option><option>2</option><option>3</option><option>4+</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label" data-t="rsvp_dietary"></label>
-        <input class="form-input" type="text" name="dietary" />
-      </div>
-      <div class="form-group form-full">
-        <label class="form-label" data-t="rsvp_message"></label>
-        <textarea class="form-textarea" name="message"></textarea>
-      </div>
-      <div class="form-full">
-        <button class="btn" type="submit" data-t="rsvp_submit"></button>
-      </div>
-    </div>
-  </form>
-  <div class="form-success" id="rsvp-ok" data-t="rsvp_success"></div>
-</div>
-
 <!-- FOOTER -->
 <footer>
   <p class="footer-logo">Mathieu · 50</p>
@@ -342,35 +316,49 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7VcWRrUxxVMR6wyJd-fo7qOdse7jL6lxsxYSG1XV9wJZpdccNtWt5d17MjUsTWR27rA/exec';
+// RSVP closed after the event (Apps Script URL kept for reference): 'https://script.google.com/macros/s/AKfycbx7VcWRrUxxVMR6wyJd-fo7qOdse7jL6lxsxYSG1XV9wJZpdccNtWt5d17MjUsTWR27rA/exec';
 
 // ── TRANSLATIONS ──────────────────────────────────────────────────────
 const T = {
   en: {
-    nav_options:'Options', nav_programme:'Programme', nav_map:'Map', nav_accom:'Stay', nav_rsvp:'RSVP', nav_photos:'Photos', nav_messages:'Messages',
+    nav_options:'Options', nav_programme:'Programme', nav_map:'Map', nav_accom:'Stay', nav_recap:'Recap', nav_photos:'Photos', nav_messages:'Messages',
     hero_eyebrow:'16 – 20 September 2026 · Valle Maggia, Ticino',
-    hero_title:'Mathieu<br><em>turns 50</em>',
-    hero_tagline:'A five-day journey through the Swiss Alps',
-    cd_days:'Days', cd_hours:'Hours', cd_mins:'Minutes', cd_secs:'Seconds',
-    about_label:'The celebration',
-    about_title:'Fifty years.\nFive days in the mountains.',
-    about_body:"To mark half a century, Mathieu is inviting family and friends on a journey along the Via Alta Valle Maggia — five days of hiking through one of Ticino's most beautiful valleys, culminating in a celebratory lunch at Ristorante Walser in Bosco Gurin on Sunday, September 20th. Come for all of it, or join us for the last stretch.",
+    hero_title:'Mathieu<br><em>turned 50</em>',
+    hero_tagline:'Thank you for walking with me',
+    st_days:'Days on the trail', st_dinner:'At dinner in Cimalmotto', st_lunch:'At lunch in Bosco Gurin', st_swim:'Swim in an alpine lake',
+    thanks_label:'Thank you',
+    thanks_title:'Thank you,\nwith all my heart.',
+    thanks_body:"Fifty years, four days on the trail and 66 people around one table in Bosco Gurin. Thank you to those who walked with me through rain and fog, to those who joined us in Cimalmotto, to those who came up to Bosco Gurin for lunch, and to those who were thinking of me from afar. To my family, to Deborah and to all my friends: this was a gift I will never forget.",
+    recap_label:'How it went', recap_title:'The story\nof the trek.',
+    recap_intro:'The weather had its own ideas, so the route changed a little along the way. Here is how the days actually unfolded.',
+    recap:[
+      { date:'Wed 16 Sept', title:'Setting off anyway',
+        text:'The forecast was terrible, so the first stage was dropped. Bart and I drove down all the same, putting the car on the train at Brig, stopping for chestnut gnocchi, then crossing the Centovalli in the rain to Maggia.' },
+      { date:'Thu 17 Sept', title:'Up to Capanna Alzasca',
+        text:"A panettone from the famous Poncini bakery, groceries at the Migros, Yann picked up in Locarno and lunch under a vine pergola in Someo. Then, with Renato, up along the Maggia and past the alpine pastures to Alzasca: a cold beer, a quick run up to the lake and — surprise — the hut keeper had tiramisù. In the evening, Bart's first tarot lesson." },
+      { date:'Fri 18 Sept', title:'Through the fog to Capanna Ribia',
+        text:"A tough climb in the fog, over into the Val di Fondale and on to the tiny Ribia hut. We cooked our own spaghetti next to the other hikers' couscous and Thai noodles, smoked ourselves out trying to light the stove, saw the stars come out after dinner — and in the middle of the night a mouse was found rummaging in Yann's backpack." },
+      { date:'Sat 19 Sept', title:'Three lakes, a swim and the party in Cimalmotto',
+        text:"Panettone for breakfast, a drone flight around the hut, then the chained pass and the descent into the Val di Campo past three lakes. At Lago di Sfii I went for a swim: turning 50 called for something memorable (nobody followed me). That evening at La Reggia in Cimalmotto we were 33, thirteen of them children: polenta with gansit, chestnut cake and a lot of laughter, thanks to Elena and Fausto." },
+      { date:'Sun 20 Sept', title:'All together to Bosco Gurin',
+        text:"About thirty of us, children included, walked the last stage: 8.5 km over the Quadrella pass. In Bosco Gurin the other guests were waiting: 66 at the table at Hotel Walser, porcini risotto, a few speeches, Flavia's cake and, to close, a song for my friends, with uncle Angelo on the accordion and Lorenzo and me on guitars." }
+    ],
+    ph_label:'Photos', ph_title:'Share your\nmemories.',
+    ph_body:'Do you have photos from the trek, the dinner in Cimalmotto or the lunch in Bosco Gurin? Post them on the message board and I will add them to the gallery.',
+    ph_btn_gallery:'See the photos', ph_btn_upload:'Share your photos',
     options_label:'How to join',
     options_title:'Choose your\nadventure.',
     options_intro:"The celebration is open to everyone — whether you're a seasoned hiker or prefer to arrive by car. Choose the option that suits you best.",
     options:[
       { badge:'Option 1', title:'The Full Trek', dates:'Wed 16 → Sun 20 Sept',
         desc:"Join from the very start in Lodano and walk the entire Via Alta Valle Maggia. Five days of mountain huts, alpine landscapes, and a birthday celebration en route.",
-        includes:['5 days hiking the Alta Via Valle Maggia','4 nights in mountain huts (capanne)','Birthday night at Capanna Ribia, 18 Sept','Saturday dinner in Cimalmotto with group of option 2','Final lunch at Ristorante Walser'],
-        cta:'Register for this option' },
+        includes:['5 days hiking the Alta Via Valle Maggia','4 nights in mountain huts (capanne)','Birthday night at Capanna Ribia, 18 Sept','Saturday dinner in Cimalmotto with group of option 2','Final lunch at Ristorante Walser'] },
       { badge:'Option 2', title:'The Weekend Trek', dates:'Sat 19 → Sun 20 Sept',
         desc:'Meet the trekking group in Cimalmotto on Saturday evening for dinner, spend the night, then hike the final leg to Bosco Gurin together on Sunday morning.',
-        includes:['Let\'s meet in Cimalmotto in the afternoon of saturday','Saturday dinner with group of option 1','1 night in Cimalmotto','Sunday morning hike: Cimalmotto → Bosco Gurin (3h30)','Final lunch at Ristorante Walser with the FULL group'],
-        cta:'Register for this option' },
+        includes:['Let\'s meet in Cimalmotto in the afternoon of saturday','Saturday dinner with group of option 1','1 night in Cimalmotto','Sunday morning hike: Cimalmotto → Bosco Gurin (3h30)','Final lunch at Ristorante Walser with the FULL group'] },
       { badge:'Option 3', title:'The Celebration', dates:'Sun 20 Sept · Midday',
         desc:'Join us directly at Ristorante Walser in Bosco Gurin for the birthday lunch. The village is easily accessible by car — a warm welcome awaits.',
-        includes:['Celebratory lunch at Ristorante Walser','Bosco Gurin accessible by car','Perfect for those who cannot walk','The whole group, together'],
-        cta:'Register for this option' }
+        includes:['Celebratory lunch at Ristorante Walser','Bosco Gurin accessible by car','Perfect for those who cannot walk','The whole group, together'] }
     ],
     prog_label:'Day by day',
     prog_title:'The full itinerary.',
@@ -415,44 +403,47 @@ const T = {
         desc:'A charming boutique hotel in the upper Valle Maggia, well-placed for guests driving to the final celebration or looking for a comfortable base near Bosco Gurin.',
         link:'https://www.fiordicampo.ch/en/' }
     ],
-    rsvp_label:'Reply', rsvp_title:'Will you join\nus?',
-    rsvp_intro:'Please register by 1st June 2026 so we can plan meals, mountain hut bookings, and logistics. We look forward to celebrating with you.',
-    rsvp_name:'Your full name', rsvp_email:'Email address', rsvp_option:'Which option are you joining?',
-    rsvp_option_items:[
-      { value:'option1', title:'Option 1 — Full Trek', sub:'Wed 16 Sept, Lodano → Sun 20 Sept, Bosco Gurin' },
-      { value:'option2', title:'Option 2 — Weekend Trek', sub:'Sat 19 Sept, Cimalmotto → Sun 20 Sept, Bosco Gurin' },
-      { value:'option3', title:'Option 3 — Celebration Lunch Only', sub:'Sun 20 Sept, midday, Ristorante Walser, Bosco Gurin' }
-    ],
-    rsvp_guests:'Number of people', rsvp_dietary:'Dietary requirements',
-    rsvp_message:'Message for Mathieu (optional)', rsvp_submit:'Send RSVP',
-    rsvp_success:"🙏 Thank you! Your RSVP has been received. See you in the mountains — or at the table! 🏔️",
   },
 
   fr: {
-    nav_options:'Options', nav_programme:'Programme', nav_map:'Carte', nav_accom:'Séjour', nav_rsvp:'RSVP', nav_photos:'Photos', nav_messages:'Messages',
+    nav_options:'Options', nav_programme:'Programme', nav_map:'Carte', nav_accom:'Séjour', nav_recap:'Récit', nav_photos:'Photos', nav_messages:'Messages',
     hero_eyebrow:'16 – 20 Septembre 2026 · Valle Maggia, Tessin',
-    hero_title:'Mathieu<br><em>fête ses 50 ans</em>',
-    hero_tagline:'Cinq jours de randonnée dans les Alpes suisses',
-    cd_days:'Jours', cd_hours:'Heures', cd_mins:'Minutes', cd_secs:'Secondes',
-    about_label:'La célébration',
-    about_title:'Cinquante ans.\nCinq jours en montagne.',
-    about_body:"Pour marquer ce demi-siècle, Mathieu invite famille et amis à parcourir la Via Alta Valle Maggia — cinq jours de randonnée dans l'une des plus belles vallées du Tessin, jusqu'à un déjeuner festif au Ristorante Walser à Bosco Gurin le dimanche 20 septembre. Venez pour tout le parcours, ou rejoignez-nous pour le dernier tronçon.",
+    hero_title:'Mathieu<br><em>a fêté ses 50 ans</em>',
+    hero_tagline:'Merci d’avoir marché avec moi',
+    st_days:'Jours de marche', st_dinner:'Au dîner à Cimalmotto', st_lunch:'Au déjeuner à Bosco Gurin', st_swim:'Baignade dans un lac alpin',
+    thanks_label:'Merci',
+    thanks_title:'Merci,\nde tout cœur.',
+    thanks_body:"Cinquante ans, quatre jours de marche et 66 personnes autour d'une table à Bosco Gurin. Merci à ceux qui ont marché avec moi sous la pluie et dans le brouillard, à ceux qui nous ont rejoints à Cimalmotto, à ceux qui sont montés à Bosco Gurin pour le déjeuner, et à ceux qui ont pensé à moi de loin. À ma famille, à Deborah et à tous mes amis : c'est un cadeau que je n'oublierai jamais.",
+    recap_label:'Comment ça s’est passé', recap_title:'Le récit\ndu trek.',
+    recap_intro:"La météo avait ses propres idées, et le parcours a un peu changé en route. Voici comment les journées se sont vraiment déroulées.",
+    recap:[
+      { date:'Mer 16 sept', title:'On part quand même',
+        text:"Les prévisions étaient mauvaises, la première étape a donc été abandonnée. Bart et moi sommes descendus quand même en voiture, en la chargeant sur le train à Brigue, avec une halte pour des gnocchis à la farine de châtaigne, puis la traversée des Centovalli sous la pluie jusqu'à Maggia." },
+      { date:'Jeu 17 sept', title:'Montée à la Capanna Alzasca',
+        text:"Un panettone de la célèbre boulangerie Poncini, les courses à la Migros, Yann récupéré à Locarno et un déjeuner sous une treille à Someo. Puis, avec Renato, la montée le long de la Maggia et des alpages jusqu'à Alzasca : une bière fraîche, un saut jusqu'au lac et — surprise — le gardien avait du tiramisù. Le soir, première leçon de tarot avec Bart." },
+      { date:'Ven 18 sept', title:'Dans le brouillard jusqu’à la Ribia',
+        text:"Une montée exigeante dans le brouillard, par le Val di Fondale, jusqu'à la petite cabane Ribia. Nos spaghettis cuisinés à côté du couscous et des nouilles thaïes des autres randonneurs, un poêle qui nous a tous enfumés, les étoiles après le dîner — et en pleine nuit, une souris dans le sac de Yann." },
+      { date:'Sam 19 sept', title:'Trois lacs, une baignade et la fête à Cimalmotto',
+        text:"Panettone au petit-déjeuner, un vol de drone autour de la cabane, puis le col équipé de chaînes et la descente vers le Val di Campo en passant par trois lacs. Au lac de Sfii, je me suis baigné : pour mes 50 ans, il fallait quelque chose de mémorable (personne ne m'a suivi). Le soir, à La Reggia de Cimalmotto, nous étions 33, dont treize enfants : polenta aux gansit, gâteau aux châtaignes et beaucoup de rires, grâce à Elena et Fausto." },
+      { date:'Dim 20 sept', title:'Tous ensemble à Bosco Gurin',
+        text:"Une trentaine de personnes, enfants compris, pour la dernière étape : 8,5 km par le col de la Quadrella. À Bosco Gurin, les autres invités nous attendaient : 66 à table à l'Hôtel Walser, risotto aux bolets, quelques discours, le gâteau de Flavia et, pour finir, une chanson pour mes amis, avec l'oncle Angelo à l'accordéon, Lorenzo et moi aux guitares." }
+    ],
+    ph_label:'Photos', ph_title:'Partagez vos\nsouvenirs.',
+    ph_body:"Vous avez des photos du trek, du dîner à Cimalmotto ou du déjeuner à Bosco Gurin ? Publiez-les sur le livre d'or et je les ajouterai à la galerie.",
+    ph_btn_gallery:'Voir les photos', ph_btn_upload:'Partager vos photos',
     options_label:'Comment participer',
     options_title:'Choisissez votre\naventure.',
     options_intro:"La célébration est ouverte à tous — que vous soyez randonneur aguerri ou préfériez arriver en voiture. Choisissez l'option qui vous convient.",
     options:[
       { badge:'Option 1', title:'Le Trek Complet', dates:'Mer 16 → Dim 20 Sept',
         desc:"Rejoignez-nous dès le départ à Lodano pour parcourir l'intégralité de la Via Alta Valle Maggia. Cinq jours de refuges alpins, de panoramas et d'un anniversaire en altitude.",
-        includes:["5 jours sur l'Alta Via Valle Maggia","4 nuits en cabanes alpines","Nuit d'anniversaire à la Capanna Ribia, 18 sept","Dîner du samedi à Cimalmotto avec le groupe de l'option 2","Déjeuner final au Ristorante Walser"],
-        cta:'Je choisis cette option' },
+        includes:["5 jours sur l'Alta Via Valle Maggia","4 nuits en cabanes alpines","Nuit d'anniversaire à la Capanna Ribia, 18 sept","Dîner du samedi à Cimalmotto avec le groupe de l'option 2","Déjeuner final au Ristorante Walser"] },
       { badge:'Option 2', title:'Le Trek du Week-end', dates:'Sam 19 → Dim 20 Sept',
         desc:'Rejoignez le groupe à Cimalmotto le samedi soir pour le dîner, passez la nuit, puis ralliez Bosco Gurin à pied le dimanche matin.',
-        includes:['Rendez-vous à Cimalmotto dans l\'après-midi du samedi','Dîner du samedi avec le groupe de l\'option 1','1 nuit à Cimalmotto','Randonnée matinale du dimanche : Cimalmotto → Bosco Gurin (3h30)','Déjeuner final au Ristorante Walser avec TOUT le groupe'],
-        cta:'Je choisis cette option' },
+        includes:['Rendez-vous à Cimalmotto dans l\'après-midi du samedi','Dîner du samedi avec le groupe de l\'option 1','1 nuit à Cimalmotto','Randonnée matinale du dimanche : Cimalmotto → Bosco Gurin (3h30)','Déjeuner final au Ristorante Walser avec TOUT le groupe'] },
       { badge:'Option 3', title:'La Célébration', dates:'Dim 20 Sept · Midi',
         desc:'Rejoignez-nous directement au Ristorante Walser à Bosco Gurin pour le déjeuner d\'anniversaire. Le village est facilement accessible en voiture.',
-        includes:['Déjeuner de fête au Ristorante Walser','Bosco Gurin accessible en voiture','Idéal pour ceux qui ne peuvent pas marcher','Tout le monde réuni'],
-        cta:'Je choisis cette option' }
+        includes:['Déjeuner de fête au Ristorante Walser','Bosco Gurin accessible en voiture','Idéal pour ceux qui ne peuvent pas marcher','Tout le monde réuni'] }
     ],
     prog_label:'Jour par jour', prog_title:"L'itinéraire complet.",
     prog_intro:"Chaque journée apporte un nouveau paysage et un nouveau refuge. L'itinéraire ci-dessous concerne l'Option 1 — le parcours intégral de Lodano à Bosco Gurin.",
@@ -496,44 +487,47 @@ const T = {
         desc:'Un charmant hôtel de charme dans la haute vallée du Maggia, bien situé pour ceux qui viennent en voiture à la célébration finale.',
         link:'https://www.fiordicampo.ch/en/' }
     ],
-    rsvp_label:'Réponse', rsvp_title:'Serez-vous\ndes nôtres ?',
-    rsvp_intro:"Merci de vous inscrire avant le 1er juin 2026 afin que nous puissions planifier les repas, les réservations de cabanes et la logistique.",
-    rsvp_name:'Nom complet', rsvp_email:'Adresse e-mail', rsvp_option:'Quelle option choisissez-vous ?',
-    rsvp_option_items:[
-      { value:'option1', title:'Option 1 — Trek complet', sub:'Mer 16 sept, Lodano → Dim 20 sept, Bosco Gurin' },
-      { value:'option2', title:'Option 2 — Trek du week-end', sub:'Sam 19 sept, Cimalmotto → Dim 20 sept, Bosco Gurin' },
-      { value:'option3', title:'Option 3 — Déjeuner uniquement', sub:'Dim 20 sept, midi, Ristorante Walser, Bosco Gurin' }
-    ],
-    rsvp_guests:'Nombre de personnes', rsvp_dietary:'Régime alimentaire',
-    rsvp_message:'Message pour Mathieu (optionnel)', rsvp_submit:'Envoyer ma réponse',
-    rsvp_success:"🙏 Merci ! Votre réponse a bien été reçue. À bientôt en montagne — ou à table ! 🏔️",
   },
 
   it: {
-    nav_options:'Opzioni', nav_programme:'Programma', nav_map:'Mappa', nav_accom:'Soggiorno', nav_rsvp:'RSVP', nav_photos:'Foto', nav_messages:'Messaggi',
+    nav_options:'Opzioni', nav_programme:'Programma', nav_map:'Mappa', nav_accom:'Soggiorno', nav_recap:'Racconto', nav_photos:'Foto', nav_messages:'Messaggi',
     hero_eyebrow:'16 – 20 Settembre 2026 · Valle Maggia, Ticino',
-    hero_title:'Mathieu<br><em>compie 50 anni</em>',
-    hero_tagline:'Cinque giorni sulle Alpi svizzere',
-    cd_days:'Giorni', cd_hours:'Ore', cd_mins:'Minuti', cd_secs:'Secondi',
-    about_label:'La celebrazione',
-    about_title:"Cinquant'anni.\nCinque giorni in montagna.",
-    about_body:"Per festeggiare mezzo secolo, Mathieu invita familiari e amici a percorrere la Via Alta Valle Maggia — cinque giorni di trekking in una delle valli più belle del Ticino, con un pranzo di festa al Ristorante Walser a Bosco Gurin domenica 20 settembre. Venite per l'intero percorso, o unitevi a noi per l'ultima tappa.",
+    hero_title:'Mathieu<br><em>ha compiuto 50 anni</em>',
+    hero_tagline:'Grazie per aver camminato con me',
+    st_days:'Giorni di cammino', st_dinner:'A cena a Cimalmotto', st_lunch:'A pranzo a Bosco Gurin', st_swim:'Bagno in un lago alpino',
+    thanks_label:'Grazie',
+    thanks_title:'Grazie\ndi cuore.',
+    thanks_body:"Cinquant'anni, quattro giorni di cammino e 66 persone attorno a un tavolo a Bosco Gurin. Grazie a chi ha camminato con me sotto la pioggia e nella nebbia, a chi ci ha raggiunti a Cimalmotto, a chi è salito fino a Bosco Gurin per il pranzo, e a chi mi ha pensato da lontano. Alla mia famiglia, a Deborah e a tutti gli amici: è stato un regalo che non dimenticherò.",
+    recap_label:"Com'è andata", recap_title:'Il racconto\ndel trekking.',
+    recap_intro:"Il tempo aveva altri piani, e il percorso è cambiato un po' strada facendo. Ecco come sono andate davvero le giornate.",
+    recap:[
+      { date:'Mer 16 sett', title:'Si parte comunque',
+        text:"Le previsioni erano pessime, così la prima tappa è saltata. Bart e io siamo scesi lo stesso in macchina, caricandola sul treno a Briga, con una sosta per gli gnocchi di farina di castagne, poi attraverso le Centovalli sotto la pioggia fino a Maggia." },
+      { date:'Gio 17 sett', title:"Salita alla Capanna Alzasca",
+        text:"Un panettone della famosa panetteria Poncini, la spesa alla Migros, Yann recuperato a Locarno e il pranzo sotto una pergola d'uva a Someo. Poi, con Renato, su lungo la Maggia e gli alpeggi fino all'Alzasca: birra fresca, un salto al lago e — sorpresa — il capannaro aveva il tiramisù. La sera, prima lezione di tarocchi con Bart." },
+      { date:'Ven 18 sett', title:'Nella nebbia fino alla Ribia',
+        text:"Una salita impegnativa nella nebbia, attraverso la Val di Fondale fino alla piccola Capanna Ribia. I nostri spaghetti accanto al couscous e alle tagliatelle thailandesi degli altri escursionisti, una stufa che ci ha affumicati tutti, le stelle dopo cena — e nel cuore della notte un topolino nello zaino di Yann." },
+      { date:'Sab 19 sett', title:'Tre laghi, un bagno e la festa a Cimalmotto',
+        text:"Panettone a colazione, un volo col drone attorno alla capanna, poi il colle con le catene e la discesa nella Val di Campo passando da tre laghi. Al lago di Sfii ho fatto il bagno: per i 50 anni ci voleva qualcosa di memorabile (nessuno mi ha seguito). La sera, alla Reggia di Cimalmotto, eravamo 33, di cui tredici bambini: polenta con i gansit, torta di castagne e tanta allegria, grazie a Elena e Fausto." },
+      { date:'Dom 20 sett', title:'Tutti insieme a Bosco Gurin',
+        text:"Una trentina di persone, bambini compresi, per l'ultima tappa: 8,5 km passando dal passo Quadrella. A Bosco Gurin ci aspettavano gli altri invitati: 66 a tavola all'Hotel Walser, risotto ai porcini, qualche discorso, la torta di Flavia e, per chiudere, una canzone per gli amici, con lo zio Angelo alla fisarmonica e Lorenzo e io alle chitarre." }
+    ],
+    ph_label:'Foto', ph_title:'Condividete\ni vostri ricordi.',
+    ph_body:'Avete foto del trekking, della cena a Cimalmotto o del pranzo a Bosco Gurin? Caricatele sulla bacheca dei messaggi e le aggiungerò alla galleria.',
+    ph_btn_gallery:'Guarda le foto', ph_btn_upload:'Condividi le tue foto',
     options_label:'Come partecipare',
     options_title:'Scegli la tua\naventura.',
     options_intro:"La celebrazione è aperta a tutti — che siate escursionisti esperti o preferiate arrivare in auto. Scegliete l'opzione più adatta.",
     options:[
       { badge:'Opzione 1', title:'Il Trekking Completo', dates:'Mer 16 → Dom 20 Sett',
         desc:"Unitevi dall'inizio a Lodano per percorrere l'intera Via Alta Valle Maggia. Cinque giorni di rifugi alpini, paesaggi mozzafiato e un compleanno in quota.",
-        includes:["5 giorni sull'Alta Via Valle Maggia","4 notti nei rifugi alpini","Notte di compleanno alla Capanna Ribia, 18 sett","Cena del sabato a Cimalmotto con il gruppo dell'opzione 2","Pranzo finale al Ristorante Walser"],
-        cta:'Scelgo questa opzione' },
+        includes:["5 giorni sull'Alta Via Valle Maggia","4 notti nei rifugi alpini","Notte di compleanno alla Capanna Ribia, 18 sett","Cena del sabato a Cimalmotto con il gruppo dell'opzione 2","Pranzo finale al Ristorante Walser"] },
       { badge:'Opzione 2', title:'Il Trekking del Weekend', dates:'Sab 19 → Dom 20 Sett',
         desc:'Raggiungete il gruppo a Cimalmotto sabato sera per la cena, pernottate, poi percorrete l\'ultima tappa fino a Bosco Gurin domenica mattina.',
-        includes:['Ci troviamo a Cimalmotto nel pomeriggio di sabato','Cena del sabato con il gruppo dell\'opzione 1','1 notte a Cimalmotto','Escursione mattutina di domenica: Cimalmotto → Bosco Gurin (3h30)','Pranzo finale al Ristorante Walser con TUTTO il gruppo'],
-        cta:'Scelgo questa opzione' },
+        includes:['Ci troviamo a Cimalmotto nel pomeriggio di sabato','Cena del sabato con il gruppo dell\'opzione 1','1 notte a Cimalmotto','Escursione mattutina di domenica: Cimalmotto → Bosco Gurin (3h30)','Pranzo finale al Ristorante Walser con TUTTO il gruppo'] },
       { badge:'Opzione 3', title:'La Celebrazione', dates:'Dom 20 Sett · Mezzogiorno',
         desc:'Unitevi direttamente al Ristorante Walser a Bosco Gurin per il pranzo di compleanno. Il paese è raggiungibile facilmente in auto.',
-        includes:['Pranzo di festa al Ristorante Walser','Bosco Gurin raggiungibile in auto','Ideale per chi non può camminare','Tutti insieme'],
-        cta:'Scelgo questa opzione' }
+        includes:['Pranzo di festa al Ristorante Walser','Bosco Gurin raggiungibile in auto','Ideale per chi non può camminare','Tutti insieme'] }
     ],
     prog_label:'Giorno per giorno', prog_title:"L'itinerario completo.",
     prog_intro:"Ogni giorno porta un nuovo paesaggio e un nuovo rifugio. Il programma seguente riguarda l'Opzione 1 — il percorso completo da Lodano a Bosco Gurin.",
@@ -577,17 +571,6 @@ const T = {
         desc:"Un incantevole hotel di charme nell'alta Valle Maggia, ben posizionato per chi viene in auto alla celebrazione finale.",
         link:'https://www.fiordicampo.ch/en/' }
     ],
-    rsvp_label:'Risposta', rsvp_title:'Ci sarete?',
-    rsvp_intro:"Vi preghiamo di iscrivervi entro il 1° giugno 2026 per permetterci di pianificare pasti, prenotazioni e logistica.",
-    rsvp_name:'Nome completo', rsvp_email:'Indirizzo e-mail', rsvp_option:'Quale opzione sceglierai?',
-    rsvp_option_items:[
-      { value:'option1', title:'Opzione 1 — Trekking completo', sub:'Mer 16 sett, Lodano → Dom 20 sett, Bosco Gurin' },
-      { value:'option2', title:'Opzione 2 — Trekking del weekend', sub:'Sab 19 sett, Cimalmotto → Dom 20 sett, Bosco Gurin' },
-      { value:'option3', title:'Opzione 3 — Solo pranzo di festa', sub:'Dom 20 sett, mezzogiorno, Ristorante Walser, Bosco Gurin' }
-    ],
-    rsvp_guests:'Numero di persone', rsvp_dietary:'Esigenze alimentari',
-    rsvp_message:'Messaggio per Mathieu (opzionale)', rsvp_submit:'Invia la risposta',
-    rsvp_success:"🙏 Grazie! La tua risposta è stata ricevuta. A presto in montagna — o a tavola! 🏔️",
   }
 };
 
@@ -608,9 +591,9 @@ function setLang(l) {
   renderOptions(t);
   renderProgramme(t);
   renderAccom(t);
-  renderRsvpOptions(t);
-  document.querySelector('a[href^="photos.html"]').href = `photos.html?lang=${l}`;
-  document.querySelector('a[href^="messageboard.html"]').href = `messageboard.html?lang=${l}`;
+  renderRecap(t);
+  document.querySelectorAll('a[href^="messageboard.html"]').forEach(a => a.href = `messageboard.html?lang=${l}`);
+  document.querySelectorAll('a[href^="photos.html"]').forEach(a => a.href = `photos.html?lang=${l}`);
 }
 
 // ── RENDER OPTIONS ────────────────────────────────────────────────────
@@ -625,7 +608,6 @@ function renderOptions(t) {
         <span class="opt-includes-label">${l('includes')}</span>
         ${o.includes.map(x => `<div class="opt-include-item">${x}</div>`).join('')}
       </div>
-      <a href="#rsvp" class="opt-cta" onclick="selectOption(${i})">${o.cta}</a>
     </div>`).join('');
 }
 
@@ -673,54 +655,21 @@ function renderAccom(t) {
     </div>`).join('');
 }
 
-// ── RENDER RSVP OPTIONS ───────────────────────────────────────────────
-function renderRsvpOptions(t) {
-  document.getElementById('rsvp-radios').innerHTML = t.rsvp_option_items.map(o => `
-    <label class="radio-opt">
-      <input type="radio" name="option" value="${o.value}" required />
+// ── RENDER RECAP ──────────────────────────────────────────────────────
+function renderRecap(t) {
+  document.getElementById('recap-list').innerHTML = t.recap.map(d => `
+    <div class="recap-day">
+      <span class="recap-date">${d.date}</span>
       <div>
-        <div class="radio-opt-title">${o.title}</div>
-        <div class="radio-opt-sub">${o.sub}</div>
+        <div class="recap-title">${d.title}</div>
+        <div class="recap-text">${d.text}</div>
       </div>
-    </label>`).join('');
-}
-
-function selectOption(i) {
-  setTimeout(() => {
-    const radios = document.querySelectorAll('input[name="option"]');
-    if (radios[i]) radios[i].checked = true;
-  }, 400);
-}
-
-// ── COUNTDOWN ─────────────────────────────────────────────────────────
-function tick() {
-  const diff = Math.max(0, new Date('2026-09-16T12:00:00+02:00') - new Date());
-  document.getElementById('cd-d').textContent = String(Math.floor(diff/86400000)).padStart(3,'0');
-  document.getElementById('cd-h').textContent = String(Math.floor(diff%86400000/3600000)).padStart(2,'0');
-  document.getElementById('cd-m').textContent = String(Math.floor(diff%3600000/60000)).padStart(2,'0');
-  document.getElementById('cd-s').textContent = String(Math.floor(diff%60000/1000)).padStart(2,'0');
+    </div>`).join('');
 }
 
 // ── NAV SCROLL ────────────────────────────────────────────────────────
 window.addEventListener('scroll', () =>
   document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 40));
-
-// ── RSVP SUBMIT ───────────────────────────────────────────────────────
-async function submitRsvp(e) {
-  e.preventDefault();
-  const btn = e.target.querySelector('button[type="submit"]');
-  btn.textContent = '…'; btn.disabled = true;
-  const payload = Object.fromEntries(new FormData(e.target).entries());
-  try {
-    if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE')
-      await fetch(APPS_SCRIPT_URL, { method:'POST', body: new URLSearchParams(payload) });
-  } catch(_) {}
-  e.target.style.display = 'none';
-  const ok = document.getElementById('rsvp-ok');
-  ok.style.display = 'block';
-  ok.textContent = T[lang].rsvp_success;
-}
-
 
 // ── MAP ───────────────────────────────────────────────────────────────
 function initMap() {
@@ -754,8 +703,6 @@ function initMap() {
 
 // ── INIT ──────────────────────────────────────────────────────────────
 setLang('it');
-tick();
-setInterval(tick, 1000);
 window.addEventListener('load', () => { initMap(); });
 </script>
 </body>

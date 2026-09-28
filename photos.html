@@ -42,8 +42,22 @@
 
     /* GALLERY */
     .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 40px; }
-    .gal-ph { aspect-ratio: 4/3; background: var(--border); display: flex; align-items: center; justify-content: center; }
-    .gal-ph span { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--light); }
+    .gal-item { position: relative; aspect-ratio: 4/3; background: var(--border); overflow: hidden; cursor: zoom-in; border: none; padding: 0; }
+    .gal-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+    .gal-item:hover img { transform: scale(1.03); }
+    .gal-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px; font-size: 0.68rem; color: #fff; text-align: left; background: linear-gradient(transparent, rgba(0,0,0,0.55)); }
+    .gal-empty { grid-column: 1 / -1; padding: 48px 24px; border: 1px dashed var(--accent-light); text-align: center; color: var(--mid); font-size: 0.9rem; }
+    .gal-sub { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; margin-top: 64px; }
+    .btn { display: inline-block; margin-top: 28px; padding: 13px 36px; background: var(--dark); color: var(--cream); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: background 0.2s; }
+    .btn:hover { background: var(--accent); }
+    /* LIGHTBOX */
+    #lb { position: fixed; inset: 0; z-index: 200; background: rgba(15,13,9,0.94); display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; }
+    #lb.open { display: flex; }
+    #lb img { max-width: 100%; max-height: 82vh; object-fit: contain; }
+    #lb-cap { color: rgba(255,255,255,0.75); font-size: 0.8rem; margin-top: 14px; text-align: center; }
+    .lb-btn { position: absolute; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; padding: 12px 18px; opacity: 0.7; }
+    .lb-btn:hover { opacity: 1; }
+    #lb-close { top: 10px; right: 10px; } #lb-prev { left: 4px; top: 50%; transform: translateY(-50%); } #lb-next { right: 4px; top: 50%; transform: translateY(-50%); }
 
     /* FOOTER */
     footer { text-align: center; padding: 56px 24px; border-top: 1px solid var(--border); }
@@ -64,11 +78,11 @@
 <nav id="main-nav">
   <a href="index.html" class="nav-logo">Mathieu · 50</a>
   <ul class="nav-links">
+    <li><a href="index.html#recap"         data-t="nav_recap"></a></li>
     <li><a href="index.html#options"       data-t="nav_options"></a></li>
     <li><a href="index.html#programme"     data-t="nav_programme"></a></li>
     <li><a href="index.html#map-section"   data-t="nav_map"></a></li>
     <li><a href="index.html#accommodation" data-t="nav_accom"></a></li>
-    <li><a href="index.html#rsvp"          data-t="nav_rsvp"></a></li>
     <li><a href="photos.html" class="active" data-t="nav_photos"></a></li>
     <li><a href="messageboard.html"        data-t="nav_messages"></a></li>
   </ul>
@@ -93,14 +107,20 @@
   <span class="section-label" data-t="gallery_label"></span>
   <h2 class="section-title" data-t="gallery_title"></h2>
   <p class="body-text" data-t="gallery_body"></p>
-  <div class="gallery-grid">
-    <div class="gal-ph"><span>Photo</span></div>
-    <div class="gal-ph"><span>Photo</span></div>
-    <div class="gal-ph"><span>Photo</span></div>
-    <div class="gal-ph"><span>Photo</span></div>
-    <div class="gal-ph"><span>Photo</span></div>
-    <div class="gal-ph"><span>Photo</span></div>
-  </div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+
+  <h3 class="gal-sub" data-t="guest_title"></h3>
+  <div class="gallery-grid" id="guest-grid"></div>
+  <a class="btn" id="upload-btn" href="messageboard.html" data-t="upload_btn"></a>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb" onclick="if(event.target===this)closeLb()">
+  <button class="lb-btn" id="lb-close" onclick="closeLb()" aria-label="Close">×</button>
+  <button class="lb-btn" id="lb-prev" onclick="stepLb(-1)" aria-label="Previous">‹</button>
+  <img id="lb-img" alt="" />
+  <p id="lb-cap"></p>
+  <button class="lb-btn" id="lb-next" onclick="stepLb(1)" aria-label="Next">›</button>
 </div>
 
 <!-- FOOTER -->
@@ -114,30 +134,36 @@
 const T = {
   en: {
     nav_options:'Options', nav_programme:'Programme', nav_map:'Map', nav_accom:'Stay',
-    nav_rsvp:'RSVP', nav_photos:'Photos', nav_messages:'Messages',
+    nav_recap:'Recap', nav_photos:'Photos', nav_messages:'Messages',
     hero_eyebrow:'16 – 20 September 2026 · Valle Maggia, Ticino',
     page_title:'Photos',
     page_subtitle:'Memories from the journey',
     gallery_label:'Memories', gallery_title:'Photos.',
-    gallery_body:'Photos from the journey will appear here after the event. Come back after September 20th.',
+    gallery_body:'Photos from four days on the Via Alta Valle Maggia, the dinner in Cimalmotto and the lunch in Bosco Gurin. Click a photo to enlarge it.',
+    guest_title:'From our guests', upload_btn:'Share your photos',
+    empty:'The first photos are on their way.', guest_empty:'No guest photos yet — be the first to share yours on the message board!',
   },
   fr: {
     nav_options:'Options', nav_programme:'Programme', nav_map:'Carte', nav_accom:'Séjour',
-    nav_rsvp:'RSVP', nav_photos:'Photos', nav_messages:'Messages',
+    nav_recap:'Récit', nav_photos:'Photos', nav_messages:'Messages',
     hero_eyebrow:'16 – 20 Septembre 2026 · Valle Maggia, Tessin',
     page_title:'Photos',
     page_subtitle:'Souvenirs du voyage',
     gallery_label:'Souvenirs', gallery_title:'Photos.',
-    gallery_body:'Les photos du voyage apparaîtront ici. Revenez après le 20 septembre.',
+    gallery_body:"Les photos de quatre jours sur la Via Alta Valle Maggia, du dîner à Cimalmotto et du déjeuner à Bosco Gurin. Cliquez sur une photo pour l'agrandir.",
+    guest_title:'Les photos des invités', upload_btn:'Partager vos photos',
+    empty:'Les premières photos arrivent bientôt.', guest_empty:"Pas encore de photos d'invités — soyez le premier à partager les vôtres sur le livre d'or !",
   },
   it: {
     nav_options:'Opzioni', nav_programme:'Programma', nav_map:'Mappa', nav_accom:'Soggiorno',
-    nav_rsvp:'RSVP', nav_photos:'Foto', nav_messages:'Messaggi',
+    nav_recap:'Racconto', nav_photos:'Foto', nav_messages:'Messaggi',
     hero_eyebrow:'16 – 20 Settembre 2026 · Valle Maggia, Ticino',
     page_title:'Foto',
     page_subtitle:'Ricordi del viaggio',
     gallery_label:'Ricordi', gallery_title:'Foto.',
-    gallery_body:"Le foto del viaggio appariranno qui dopo l'evento. Torna dopo il 20 settembre.",
+    gallery_body:'Le foto di quattro giorni sulla Via Alta Valle Maggia, della cena a Cimalmotto e del pranzo a Bosco Gurin. Clicca su una foto per ingrandirla.',
+    guest_title:'Le foto degli invitati', upload_btn:'Condividi le tue foto',
+    empty:'Le prime foto arriveranno presto.', guest_empty:'Ancora nessuna foto degli invitati — sii il primo a condividere le tue sulla bacheca dei messaggi!',
   }
 };
 
@@ -153,11 +179,71 @@ function setLang(l) {
     if (t[k] !== undefined) el.textContent = t[k];
   });
   document.getElementById('page-title').textContent = t.page_title;
+  document.querySelectorAll('a[href^="messageboard.html"]').forEach(a => a.href = `messageboard.html?lang=${l}`);
+  renderGalleries();
 }
+
+// ── PHOTOS ────────────────────────────────────────────────────────────
+// To add photos: put the files in the /photos folder of the repo and list them here.
+// { src: 'photos/filename.jpg', caption: 'optional caption' }
+const PHOTOS = [
+];
+
+// Guest photos come from the message board (Google Apps Script)
+const MESSAGE_BOARD_URL = 'https://script.google.com/macros/s/AKfycbyTPn8MPv_CRJ9rVQs5BQ9HCJHFQMr_73q1vVFibnxP1DS8Za2Okcm_r88Ix0o0ug1shA/exec';
+let guestPhotos = [];
+let lbList = [], lbIdx = 0;
+
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function driveImg(url) {
+  const m = url && url.includes('drive.google.com') && url.match(/[?&]id=([^&]+)/);
+  return m ? 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1600' : url;
+}
+function tiles(list, group) {
+  return list.map((p, i) => `
+    <button class="gal-item" onclick="openLb('${group}', ${i})">
+      <img src="${esc(p.src)}" alt="${esc(p.caption)}" loading="lazy" onerror="this.parentElement.style.display='none'" />
+      ${p.caption ? `<span class="gal-cap">${esc(p.caption)}</span>` : ''}
+    </button>`).join('');
+}
+function renderGalleries() {
+  const t = T[lang];
+  document.getElementById('gallery-grid').innerHTML = PHOTOS.length ? tiles(PHOTOS, 'main') : `<div class="gal-empty">${t.empty}</div>`;
+  document.getElementById('guest-grid').innerHTML = guestPhotos.length ? tiles(guestPhotos, 'guest') : `<div class="gal-empty">${t.guest_empty}</div>`;
+}
+async function loadGuestPhotos() {
+  try {
+    const res = await fetch(MESSAGE_BOARD_URL, { redirect:'follow' });
+    const data = await res.json();
+    if (!Array.isArray(data)) return;
+    guestPhotos = data.filter(m => m.img).map(m => ({ src: driveImg(m.img), caption: m.name }));
+    renderGalleries();
+  } catch(_) {}
+}
+
+// ── LIGHTBOX ──────────────────────────────────────────────────────────
+function openLb(group, i) {
+  lbList = group === 'main' ? PHOTOS : guestPhotos; lbIdx = i; showLb();
+  document.getElementById('lb').classList.add('open');
+}
+function showLb() {
+  const p = lbList[lbIdx];
+  document.getElementById('lb-img').src = p.src;
+  document.getElementById('lb-cap').textContent = p.caption || '';
+}
+function stepLb(d) { lbIdx = (lbIdx + d + lbList.length) % lbList.length; showLb(); }
+function closeLb() { document.getElementById('lb').classList.remove('open'); }
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLb();
+  if (e.key === 'ArrowLeft') stepLb(-1);
+  if (e.key === 'ArrowRight') stepLb(1);
+});
 
 // ── INIT ──────────────────────────────────────────────────────────────
 const initLang = new URLSearchParams(window.location.search).get('lang');
-setLang(['en','fr','it'].includes(initLang) ? initLang : 'en');
+setLang(['en','fr','it'].includes(initLang) ? initLang : 'it');
+loadGuestPhotos();
 </script>
 </body>
 </html>
